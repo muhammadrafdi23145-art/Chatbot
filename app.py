@@ -60,7 +60,7 @@ if prompt := st.chat_input("How can I help you?"):
             st.markdown(prompt)
 
         try:
-            llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=api_key)
+            llm = ChatGoogleGenerativeAI(model="gemini-3.0-flash-preview", "gemini-2.5-flash", "gemini-2.0-flash", google_api_key=api_key)
             with st.chat_message("assistant"):
                 response = llm.invoke(st.session_state.messages)
                 st.markdown(response.content)
