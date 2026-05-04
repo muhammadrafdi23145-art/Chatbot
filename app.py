@@ -3,15 +3,26 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
 # Page Configuration
-st.set_page_config(page_title="Celerates AI Assistant", layout="centered")
+st.set_page_config(page_title="Travel AI Assistant", layout="centered")
 
-# Sidebar for API Key
+# Sidebar for API Key & Model Selection
 with st.sidebar:
     st.title("Settings")
     api_key = st.text_input("Enter Google AI API Key", type="password")
+    
+    # Model Selection Dropdown
+    model_name = st.selectbox(
+        "Select AI Model", 
+        [
+            "gemini-3.0-flash-preview", 
+            "gemini-2.5-flash", 
+            "gemini-2.0-flash"
+        ]
+    )
+    
     st.info("Get your key at aistudio.google.com")
 
-# System Prompt Translation to English
+# System Prompt
 system_prompt = """
 You are an AI assistant for "Celerates Tour Agency".
 Your task is to assist customers with booking or tour package information.
@@ -30,8 +41,8 @@ Flight Options:
 
 Guidelines:
 - Greet customers warmly and professionally.
-- Help select packages and calculate total costs (Package + Flight) * Number of People.
-- Politely decline non-travel topics (politics, science, etc.) and refocus on Celerates services.
+- Help select packages and calculate total costs: (Package + Flight) * Number of People.
+- Politely decline non-travel topics (politics, science, history, etc.) and refocus on Celerates services.
 """
 
 st.title("Celerates Tour Agency Chatbot")
@@ -60,10 +71,14 @@ if prompt := st.chat_input("How can I help you?"):
             st.markdown(prompt)
 
         try:
-            llm = ChatGoogleGenerativeAI(model="gemini-3.0-flash-preview", "gemini-2.5-flash", "gemini-2.0-flash", google_api_key=api_key)
+            # Initialize LLM with the selected model
+            llm = ChatGoogleGenerativeAI(model=model_name, google_api_key=api_key)
+            
             with st.chat_message("assistant"):
                 response = llm.invoke(st.session_state.messages)
                 st.markdown(response.content)
+                
             st.session_state.messages.append(AIMessage(content=response.content))
+            
         except Exception as e:
             st.error(f"Error: {e}")
